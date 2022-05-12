@@ -83,7 +83,8 @@ ON c.product_id = m.product_id AND c.row_number = 1
 --4. What is the most purchased item on the menu and How many times was it purchased by all customers?
 SELECT m.product_name, COUNT(1) as total_order_count
 FROM sales s INNER JOIN menu m on s.product_id = m.product_id
-GROUP BY m.product_name;
+GROUP BY m.product_name
+limit 1;
 
 --5. Which item was the most popular for each customer
 WITH CTE AS (
@@ -159,7 +160,7 @@ GROUP BY customer_id
 ORDER BY 2 DESC
 ;
 
---10. In the first week after a customer joins the program(including their joindate) They earn
+--10. In the first week after a customer joins the program(including their join date) They earn
 --   2x points on all the items , not just sushi - how many points do customers A and B have at
 --   end of January?
 SELECT customer_id, SUM(price * multiplier * 10)
@@ -167,7 +168,7 @@ FROM
     (SELECT s.customer_id, product_name,
            price, order_date, join_date,
            CASE
-                WHEN s.order_date - mb.join_date >= 0 AND s.order_date - mb.join_date < 7 THEN 2
+                WHEN s.order_date - mb.join_date >= 0 AND s.order_date - mb.join_date <= 7 THEN 2
                 WHEN m.product_name = 'sushi' THEN 2
                 ELSE 1
            END AS multiplier
@@ -178,7 +179,6 @@ FROM
 WHERE EXTRACT(month FROM order_date) = '01'
 GROUP BY customer_id
 ORDER BY 2 DESC ;
-
 
 ------------------------------------- Bonus Questions ----------------------------------------
 
@@ -228,4 +228,5 @@ SELECT customer_id,
        CASE
             WHEN member ='Y' THEN RANK() OVER(PARTITION BY customer_id, member ORDER BY order_date)
        END AS ranking
-FROM temp2
+FROM temp2;
+
